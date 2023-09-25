@@ -1,0 +1,48 @@
+---
+title: "Stratified Sampling"
+author: "Gallup Korea MKT04 최원석"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+# 연습
+
+## 1. 모집단 정의
+
+-   data.table 함수를 통해 모집단 데이터셋을 생성
+
+```{r}
+library(data.table)
+library(sampling)
+
+score_dt <- data.table(gender = rbinom(1000, 1, 0.5), 
+                       age = sample(9:12, 1000, replace = TRUE), 
+                       score = rnorm(1000, 75, 7))
+```
+
+## 2. 각각의 계층에 몇개의 원소씩 포함되어있는지 확인
+
+```{r}
+score_dt[, .N, keyby = list(gender, age)]
+```
+
+## 3. strata 함수 사용
+
+-   계층 8개이므로 size 인자를 rep(20,8)로 설정함
+-   8개 각 계층에서 표본 20개씩 추출
+-   method option: "srswor" -\> Simple Random Sampling Without Replacement
+
+```{r}
+str_sam <- data.table(strata(score_dt, stratanames = c("gender", "age"), size = rep(20, 8), method = "srswor")) 
+str_sam
+```
+
+## 각 계층의 개수 확인
+
+```{r}
+str_sam[, .N, keyby = list(gender, age)]
+```
+
+## 출처
+
+-   연습 R 코드 ([Click](https://jangpiano-science.tistory.com/132))
